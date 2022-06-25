@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.inlong.manager.common.pojo.user;
+package org.apache.inlong.manager.common.pojo.group;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -23,45 +23,30 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.inlong.manager.common.enums.UserTypeEnum;
-import org.apache.inlong.manager.common.validation.InEnumInt;
+import org.hibernate.validator.constraints.Length;
 
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 
 /**
- * User info, including username, password, etc.
+ * Inlong group reset request
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ApiModel("User info")
-public class UserInfo {
+@ApiModel("Inlong group reset request")
+public class InlongGroupResetRequest {
 
-    private Integer id;
+    @ApiModelProperty(value = "Inlong group id", required = true)
+    @Length(min = 4, max = 200)
+    @Pattern(regexp = "^(?![0-9]+$)[a-z][a-z0-9_-]{1,200}$",
+            message = "inlongGroupId must starts with a lowercase letter "
+                    + "and contains only lowercase letters, digits, `-` or `_`")
+    private String inlongGroupId;
 
-    /**
-     * user type
-     * {@link UserTypeEnum}
-     */
-    @NotNull
-    @InEnumInt(UserTypeEnum.class)
-    @ApiModelProperty(value = "type: 0 - manager, 1 - operator", required = true)
-    private Integer type;
+    @ApiModelProperty(value = "If rerun process when group is in operating, 0: false 1: true")
+    private Integer rerunProcess = 0;
 
-    @NotBlank
-    @ApiModelProperty(value = "username", required = true)
-    private String username;
-
-    @NotBlank
-    @ApiModelProperty(value = "password", required = true)
-    private String password;
-
-    @NotNull
-    @Min(1)
-    @ApiModelProperty(value = "valid days", required = true)
-    private Integer validDays;
-
+    @ApiModelProperty(value = "This params will work when rerunProcess = 0, 0: reset to fail, 1: reset to success")
+    private Integer resetFinalStatus = 1;
 }
